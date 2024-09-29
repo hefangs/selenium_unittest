@@ -1,5 +1,8 @@
+import os
 import time
 import unittest
+import HtmlTestRunner
+
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
@@ -8,6 +11,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 import cv2
 import numpy as np
 import requests
+import logging
+
+# 创建 logs 目录（如果不存在）
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+# 配置日志记录，将日志文件保存到 logs 目录下
+logging.basicConfig(
+    level=logging.DEBUG,                             # 日志级别
+    format='%(asctime)s %(levelname)s %(message)s',  # 日志格式
+    datefmt='%Y-%m-%d %H:%M:%S',                     # 日期格式
+    filename=os.path.join('logs', 'test_log.log'),   # 日志文件路径
+    filemode='w'                                     # 文件写入模式
+)
+
 
 class Music163(unittest.TestCase):
 
@@ -54,7 +72,7 @@ class Music163(unittest.TestCase):
         self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, '_3fo6oHZe'))).click()
         time.sleep(2)
 
-    def test_verify(self):
+
         # 获取两张图片
         url_s = self.driver.find_element(By.CLASS_NAME, 'yidun_jigsaw').get_attribute('src')
         url_b = self.driver.find_element(By.CLASS_NAME, 'yidun_bg-img').get_attribute('src')
@@ -109,7 +127,7 @@ class Music163(unittest.TestCase):
         action.drag_and_drop_by_offset(ele, xoffset=adjusted_x, yoffset=0).perform()
         time.sleep(1)
 
-    def test_navigate(self):
+
         # 点击我的音乐-排行榜
         self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "排行榜"))).click()
         time.sleep(2)
@@ -140,4 +158,12 @@ class Music163(unittest.TestCase):
         self.driver.quit()
 
 if __name__ == "__main__":
-    unittest.main()
+    suite = unittest.TestLoader().loadTestsFromTestCase(Music163)
+    runner = HtmlTestRunner.HTMLTestRunner(
+        output='test_reports',          # 报告输出目录
+        report_name='TestReport',       # 报告文件名
+        combine_reports=True,           # 合并报告
+        descriptions=True,              # 是否包含测试用例描述
+        verbosity=2                     # 测试输出详细程度
+    )
+    runner.run(suite)
