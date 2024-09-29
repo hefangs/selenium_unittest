@@ -1,23 +1,23 @@
 import time
-
-import cv2
-import numpy as np
-import requests
+import unittest
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+import cv2
+import numpy as np
+import requests
 
+class Music163(unittest.TestCase):
 
-class Music163:
-    def __init__(self):
+    def setUp(self):
         self.driver = webdriver.Edge()
         self.driver.get("https://music.163.com")
         self.driver.maximize_window()
         self.wait = WebDriverWait(self.driver, 10)
 
-    def login(self):
+    def test_login(self):
         # 登录弹出
         self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'a[data-action="login"]'))).click()
         time.sleep(2)
@@ -54,7 +54,7 @@ class Music163:
         self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, '_3fo6oHZe'))).click()
         time.sleep(2)
 
-    def verify(self):
+    def test_verify(self):
         # 获取两张图片
         url_s = self.driver.find_element(By.CLASS_NAME, 'yidun_jigsaw').get_attribute('src')
         url_b = self.driver.find_element(By.CLASS_NAME, 'yidun_bg-img').get_attribute('src')
@@ -101,7 +101,7 @@ class Music163:
 
         # 定位到滑块
         ele = self.driver.find_element(By.XPATH,
-                                       "//div[contains(@class, 'yidun_slider') and contains(@class, 'yidun_slider--hover')]")
+                                    "//div[contains(@class, 'yidun_slider') and contains(@class, 'yidun_slider--hover')]")
         # 实例化对象
         action = ActionChains(self.driver)
         # 拖动滑块
@@ -109,7 +109,7 @@ class Music163:
         action.drag_and_drop_by_offset(ele, xoffset=adjusted_x, yoffset=0).perform()
         time.sleep(1)
 
-    def navigate(self):
+    def test_navigate(self):
         # 点击我的音乐-排行榜
         self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "排行榜"))).click()
         time.sleep(2)
@@ -136,13 +136,8 @@ class Music163:
         self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "关注"))).click()
         time.sleep(2)
 
-    def quit(self):
+    def tearDown(self):
         self.driver.quit()
 
-
 if __name__ == "__main__":
-    music = Music163()
-    music.login()
-    music.verify()
-    music.navigate()
-    music.quit()
+    unittest.main()
